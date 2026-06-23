@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StayBook - Find Real Places to Stay</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="header-left">
+                    <i class="fas fa-hotel logo-icon"></i>
+                    <div>
+                        <h1 class="app-title">StayBook</h1>
+                        <p class="app-subtitle">Find real places to stay — day, week, or month</p>
+                    </div>
+                </div>
+                <div class="header-right">
+                    <span class="browsing-text">Browsing stays (no account needed)</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="container">
+            <!-- Tabs -->
+            <div class="tabs">
+                <button class="tab-btn active" data-tab="browse">Browse Stays</button>
+                <button class="tab-btn" data-tab="saved">Saved Stays</button>
+            </div>
+
+            <!-- Browse Tab Content -->
+            <div id="browse-tab" class="tab-content active">
+                <div class="content-grid">
+                    <!-- Filters Sidebar -->
+                    <aside class="filters-sidebar">
+                        <div class="card">
+                            <div class="card-header">
+                                <i class="fas fa-filter"></i>
+                                <h3>Refine your stay</h3>
+                            </div>
+                            <div class="card-content">
+                                <!-- Stay Type Filter -->
+                                <div class="filter-group">
+                                    <label>Stay Type</label>
+                                    <select id="type-filter" class="filter-select">
+                                        <option value="all">All Stay Types</option>
+                                        <option value="private">Private Stay</option>
+                                        <option value="shared">Shared Stay</option>
+                                        <option value="family">Family Stay</option>
+                                        <option value="studio">Studio Stay</option>
+                                        <option value="longterm">Long-term Stay</option>
+                                    </select>
+                                </div>
+
+                                <!-- Number of Guests -->
+                                <div class="filter-group">
+                                    <div class="filter-label-row">
+                                        <label>Number of guests</label>
+                                        <span id="guests-value">0 guests</span>
+                                    </div>
+                                    <input type="range" id="guests-filter" min="0" max="10" value="0" class="slider">
+                                </div>
+
+                                <!-- Max Price -->
+                                <div class="filter-group">
+                                    <div class="filter-label-row">
+                                        <label>Max price per day</label>
+                                        <span id="price-value">₹500/day</span>
+                                    </div>
+                                    <input type="range" id="price-filter" min="0" max="500" value="500" step="10" class="slider">
+                                    <p class="helper-text">Weekly and monthly discounts may apply</p>
+                                </div>
+
+                                <!-- Amenities -->
+                                <div class="filter-group">
+                                    <label>Amenities</label>
+                                    <div id="amenities-list" class="amenities-list"></div>
+                                </div>
+
+                                <!-- Reset Button -->
+                                <button id="reset-filters" class="btn btn-outline">Clear all filters</button>
+                            </div>
+                        </div>
+                    </aside>
+
+                    <!-- Stays Grid -->
+                    <div class="stays-grid-container">
+                        <div class="results-count">
+                            <p id="results-text">Showing 6 of 6 stays</p>
+                        </div>
+                        <div id="stays-grid" class="stays-grid"></div>
+                        <div id="no-results" class="no-results" style="display: none;">
+                            <p>No stays match your filters</p>
+                            <button class="btn btn-outline" onclick="resetFilters()">Clear all filters</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Saved Tab Content -->
+            <div id="saved-tab" class="tab-content">
+                <div id="saved-stays-container"></div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Stay Details Modal -->
+    <div id="stay-modal" class="modal">
+        <div class="modal-overlay"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <div>
+                    <h2 id="modal-title">Stay Information</h2>
+                    <p class="modal-subtitle">View availability and stay details</p>
+                </div>
+                <button class="modal-close" onclick="closeModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <div class="modal-body">
+                <!-- Stay Summary -->
+                <div class="stay-summary">
+                    <div class="summary-row">
+                        <span>Stay Type</span>
+                        <span id="modal-type" class="badge"></span>
+                    </div>
+                    <div class="summary-row">
+                        <span>Capacity</span>
+                        <span id="modal-capacity"></span>
+                    </div>
+                    <div class="summary-row">
+                        <span>Price per day</span>
+                        <span id="modal-price" class="price-text"></span>
+                    </div>
+                </div>
+
+                <!-- Date Selection -->
+                <div class="date-grid">
+                    <div class="date-group">
+                        <label>Start Date</label>
+                        <input type="date" id="start-date" class="date-input">
+                    </div>
+                    <div class="date-group">
+                        <label>End Date</label>
+                        <input type="date" id="end-date" class="date-input">
+                    </div>
+                </div>
+
+                <!-- Number of Guests -->
+                <div class="form-group">
+                    <label>Number of Guests</label>
+                    <select id="modal-guests" class="filter-select"></select>
+                </div>
+
+                <!-- Amenities -->
+                <div class="form-group">
+                    <label>Included Amenities</label>
+                    <div id="modal-amenities" class="amenities-badges"></div>
+                </div>
+
+                <!-- Stay Summary -->
+                <div id="booking-summary" class="booking-summary" style="display: none;">
+                    <h4>Stay Summary</h4>
+                    <div class="summary-row">
+                        <div class="summary-label">
+                            <i class="fas fa-clock"></i>
+                            <span>Duration</span>
+                        </div>
+                        <span id="summary-duration"></span>
+                    </div>
+                    <div class="summary-row">
+                        <div class="summary-label">
+                            <i class="fas fa-users"></i>
+                            <span>Guests</span>
+                        </div>
+                        <span id="summary-guests"></span>
+                    </div>
+                    <div class="summary-row summary-total">
+                        <div class="summary-label">
+                            <i class="fas fa-dollar-sign"></i>
+                            <span>Total Price</span>
+                        </div>
+                        <span id="summary-total" class="price-text"></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button class="btn btn-outline" onclick="closeModal()">Close</button>
+                <button id="confirm-btn" class="btn btn-primary" onclick="confirmBooking()">Check availability & info</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <span>✓ No login required</span>
+                <span class="separator">•</span>
+                <span>✓ Anonymous reviews</span>
+                <span class="separator">•</span>
+                <span>✓ We share verified stay information</span>
+                <span class="separator">•</span>
+                <span>✓ Payments handled directly with hosts</span>
+            </div>
+            <p class="footer-tagline">
+                A free platform to discover real places to stay with clear, honest information.
+            </p>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
